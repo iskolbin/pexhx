@@ -1,11 +1,14 @@
 package pex;
 
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
 class PexXmlLoader {
 	public static inline function deg2rad( deg: Float ): Float {
 		return deg / Math.PI;
 	}
 
-	public static function load( xml: Xml ): PexEmitter {
+	public static function init( ps: PexEmitter, xml: Xml ) {
 		var root = xml.firstElement();
 
 		if (root.nodeName != "particleEmitterConfig" && root.nodeName != "lanicaAnimoParticles") {
@@ -17,8 +20,6 @@ class PexXmlLoader {
 		for (node in root.elements()) {
 			map[node.nodeName] = node;
 		}
-
-		var ps = new PexEmitter();
 
 		ps.emitterType = switch( parseIntNode(map["emitterType"])) {
 			case 0: Gravity;
@@ -87,6 +88,20 @@ class PexXmlLoader {
 		ps.yCoordFlipped = parseIntNode(map["yCoordFlipped"]) == 1;
 
 		return ps;
+	}
+
+	public static function load( xml: Xml ): PexEmitter {
+		return init( new PexEmitter(), xml );
+	}
+
+	macro public static function initCompileTime( ps: ExprOf<PexEmitter>, xmlPath: String ): Expr {
+		var data = sys.io.File.getContent( xmlPath );
+		return macro PexXmlLoader.init( ${ps}, Xml.parse($v{data}) );
+	}
+
+	macro public static function loadCompileTime( xmlPath: String ): Expr {
+		var data = sys.io.File.getContent( xmlPath );
+		return macro PexXmlLoader.init( ${macro new pex.PexEmitter()}, Xml.parse($v{data}) );
 	}
 
 	static function parseIntNode( node: Xml, attr: String = "value" ): Int {
