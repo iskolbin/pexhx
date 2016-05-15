@@ -33,7 +33,26 @@ class PexEmitter {
 	public static inline var ParticleRadiusDelta = 18;
 
 	public static inline var PARTICLE_PARAMETERS = 21; 
-	
+
+	public inline function getShiftedIndex( index: Int ) return index * PARTICLE_PARAMETERS;
+	public inline function incrementShiftedIndex( index: Int ) return index + PARTICLE_PARAMETERS;
+
+	public inline function getTimeToLive( indexShifted: Int ) return particles[indexShifted+ParticleTimeToLive];
+	public inline function getX( indexShifted: Int ) return particles[indexShifted+ParticlePositionX];
+	public inline function getY( indexShifted: Int ) return particles[indexShifted+ParticlePositionY];
+	public inline function getRed( indexShifted: Int ) return particles[indexShifted+ParticleRed];
+	public inline function getGreen( indexShifted: Int ) return particles[indexShifted+ParticleGreen];
+	public inline function getBlue( indexShifted: Int ) return particles[indexShifted+ParticleBlue];
+	public inline function getAlpha( indexShifted: Int ) return particles[indexShifted+ParticleAlpha];
+	public inline function getSize( indexShifted: Int ) return particles[indexShifted+ParticleSize];
+	public inline function getRotation( indexShifted: Int ) return particles[indexShifted+ParticleRotation];
+	public inline function getARGB( indexShifted: Int ): Int {
+		return (Std.int(particles[indexShifted+ParticleAlpha]*0xff)<<0x18) +
+			(Std.int(particles[indexShifted+ParticleRed]*0xff)<<0x10) +
+			(Std.int(particles[indexShifted+ParticleGreen]*0xff)<<0x8) +
+			(Std.int(particles[indexShifted+ParticleBlue]*0xff));
+	}
+
 	public var emitterType: PexEmitterType = Gravity;
 	public var maxParticles = 500;
 	public var particles = new Array<Float>();
@@ -98,6 +117,12 @@ class PexEmitter {
 
 	public var active = false;
 	public var restart = false;
+
+	public var useTint = true;
+	public var useAlpha = true;
+	public var useScale = true;
+	public var useRotate = true;
+	
 	var emitCounter = 0.0;
 
 	public function new() {
@@ -116,54 +141,76 @@ class PexEmitter {
 	}
 
 	@:extern inline function initParticle() {
+		var particles = this.particles;
 		var index = particleCount * PARTICLE_PARAMETERS;
 
 		if ( index+PARTICLE_PARAMETERS > particles.length ) {
 			for ( i in index...index+PARTICLE_PARAMETERS ) particles.push( 0.0 );
-			particleCount++;
 		}
+		particleCount++;
 
 		// Common
 		particles[index+ParticleTimeToLive] = Math.max(0.0001, particleLifespan + particleLifespanVariance * rnd1to1());
 		particles[index+ParticleStartPosX] = sourcePositionX;
 		particles[index+ParticleStartPosY] = sourcePositionY;
-		particles[index+ParticleRed] = clamp(startColorRed + startColorRedVariance * rnd1to1());
-		particles[index+ParticleGreen] = clamp(startColorGreen + startColorGreenVariance * rnd1to1());
-		particles[index+ParticleBlue] = clamp(startColorBlue + startColorBlueVariance * rnd1to1());
-		particles[index+ParticleAlpha] = clamp(startColorAlpha + startColorAlphaVariance * rnd1to1());
-		var redTmp = clamp(finishColorRed + finishColorRedVariance * rnd1to1());
-		var greenTmp = clamp(finishColorGreen + finishColorGreenVariance * rnd1to1());
-		var blueTmp = clamp(finishColorBlue + finishColorBlueVariance * rnd1to1());
-		var alphaTmp = clamp(finishColorAlpha + finishColorAlphaVariance * rnd1to1()); 
-		particles[index+ParticleRedDelta] = (redTmp - particles[index+ParticleRed]) / particles[index+ParticleTimeToLive];
-		particles[index+ParticleGreenDelta] = (greenTmp- particles[index+ParticleGreen]) / particles[index+ParticleTimeToLive];
-		particles[index+ParticleBlueDelta] = (blueTmp - particles[index+ParticleBlue]) / particles[index+ParticleTimeToLive];
-		particles[index+ParticleAlphaDelta] = (alphaTmp - particles[index+ParticleAlpha]) / particles[index+ParticleTimeToLive];
-		particles[index+ParticleSize] = Math.max(0.0, startParticleSize + startParticleSizeVariance * rnd1to1());
-		particles[index+ParticleSizeDelta] = (Math.max(0.0, finishParticleSize + finishParticleSizeVariance * rnd1to1()) - particles[index+ParticleSize]) / particles[index+ParticleTimeToLive];
-		particles[index+ParticleRotation] = rotationStart + rotationStartVariance * rnd1to1();
-		particles[index+ParticleRotationDelta] = (rotationEnd + rotationEndVariance * rnd1to1() - particles[index+ParticleRotation]) / particles[index+ParticleTimeToLive];
+		if ( useTint ) {
+			particles[index+ParticleRed] = clamp(startColorRed + startColorRedVariance * rnd1to1());
+			particles[index+ParticleGreen] = clamp(startColorGreen + startColorGreenVariance * rnd1to1());
+			particles[index+ParticleBlue] = clamp(startColorBlue + startColorBlueVariance * rnd1to1());
+		
+			var redTmp = clamp(finishColorRed + finishColorRedVariance * rnd1to1());
+			var greenTmp = clamp(finishColorGreen + finishColorGreenVariance * rnd1to1());
+			var blueTmp = clamp(finishColorBlue + finishColorBlueVariance * rnd1to1());
+		
+			particles[index+ParticleRedDelta] = (redTmp - particles[index+ParticleRed]) / particles[index+ParticleTimeToLive];
+			particles[index+ParticleGreenDelta] = (greenTmp- particles[index+ParticleGreen]) / particles[index+ParticleTimeToLive];
+			particles[index+ParticleBlueDelta] = (blueTmp - particles[index+ParticleBlue]) / particles[index+ParticleTimeToLive];
+		}
+
+		if ( useAlpha ) {
+			particles[index+ParticleAlpha] = clamp(startColorAlpha + startColorAlphaVariance * rnd1to1());
+
+			var alphaTmp = clamp(finishColorAlpha + finishColorAlphaVariance * rnd1to1()); 
+
+			particles[index+ParticleAlphaDelta] = (alphaTmp - particles[index+ParticleAlpha]) / particles[index+ParticleTimeToLive];
+		}
+
+		if ( useScale ) {
+			particles[index+ParticleSize] = Math.max(0.0, startParticleSize + startParticleSizeVariance * rnd1to1());
+			particles[index+ParticleSizeDelta] = (Math.max(0.0, finishParticleSize + finishParticleSizeVariance * rnd1to1()) - particles[index+ParticleSize]) / particles[index+ParticleTimeToLive];
+		}
+
+		if ( useRotate ) {
+			particles[index+ParticleRotation] = rotationStart + rotationStartVariance * rnd1to1();
+			particles[index+ParticleRotationDelta] = (rotationEnd + rotationEndVariance * rnd1to1() - particles[index+ParticleRotation]) / particles[index+ParticleTimeToLive];
+		}
 
 		var computedAngle = angle + angleVariance * rnd1to1();
-
-		// For gravity emitter type
-		var directionSpeed = speed + speedVariance * rnd1to1();
-
-		particles[index+ParticlePositionX] = particles[index+ParticleStartPosX] + sourcePositionXVariance * rnd1to1();
-		particles[index+ParticlePositionY] = particles[index+ParticleStartPosY] + sourcePositionYVariance * rnd1to1();
-		particles[index+ParticleDirectionX] = Math.cos(computedAngle) * directionSpeed;
-		particles[index+ParticleDirectionY] = Math.sin(computedAngle) * directionSpeed;
-		particles[index+ParticleRadialAcceleration] = radialAcceleration + radialAccelerationVariance * rnd1to1();
-		particles[index+ParticleTangentialAcceleration] = tangentialAcceleration + tangentialAccelerationVariance * rnd1to1();
-
-		// For radial emitter type
+		
 		particles[index+ParticleAngle] = computedAngle;
-		particles[index+ParticleAngleDelta] = (rotatePerSecond + rotatePerSecondVariance * rnd1to1()) / particles[index+ParticleTimeToLive];
-		particles[index+ParticleRadius] = maxRadius + maxRadiusVariance * rnd1to1();
-		particles[index+ParticleRadiusDelta] = (minRadius + minRadiusVariance * rnd1to1() - particles[index+ParticleRadius]) / particles[index+ParticleTimeToLive];
+
+		switch ( emitterType ) {
+			case Gravity:
+				var directionSpeed = speed + speedVariance * rnd1to1();
+				particles[index+ParticlePositionX] = sourcePositionX + sourcePositionXVariance * rnd1to1();
+				particles[index+ParticlePositionY] = sourcePositionY + sourcePositionYVariance * rnd1to1();
+				particles[index+ParticleDirectionX] = Math.cos(computedAngle) * directionSpeed;
+				particles[index+ParticleDirectionY] = Math.sin(computedAngle) * directionSpeed;
+				particles[index+ParticleRadialAcceleration] = radialAcceleration + radialAccelerationVariance * rnd1to1();
+				particles[index+ParticleTangentialAcceleration] = tangentialAcceleration + tangentialAccelerationVariance * rnd1to1();
+	
+			case Radial:
+				particles[index+ParticlePositionX] = sourcePositionX;
+				particles[index+ParticlePositionY] = sourcePositionY; 
+				particles[index+ParticleAngleDelta] = (rotatePerSecond + rotatePerSecondVariance * rnd1to1()) / particles[index+ParticleTimeToLive];
+				particles[index+ParticleRadius] = maxRadius + maxRadiusVariance * rnd1to1();
+				particles[index+ParticleRadiusDelta] = (minRadius + minRadiusVariance * rnd1to1() - particles[index+ParticleRadius]) / particles[index+ParticleTimeToLive];
+		}
 	}
+	
 
 	@:extern inline function updateParticle( index: Int, dt: Float ) {
+		var particles = this.particles;
 
 		if ( particles[index+ParticleTimeToLive] <= dt ) {
 			return false;
@@ -214,14 +261,23 @@ class PexEmitter {
 				particles[index+ParticlePositionY] = (yCoordFlipped ? -y_ : y_) + particles[index+ParticleStartPosY];
 		}
 
-		particles[index+ParticleRed] += particles[index+ParticleRedDelta] * dt;
-		particles[index+ParticleGreen] += particles[index+ParticleGreenDelta] * dt;
-		particles[index+ParticleBlue] += particles[index+ParticleBlueDelta] * dt;
-		particles[index+ParticleAlpha] += particles[index+ParticleAlphaDelta] * dt;
+		if ( useTint ) {
+			particles[index+ParticleRed] += particles[index+ParticleRedDelta] * dt;
+			particles[index+ParticleGreen] += particles[index+ParticleGreenDelta] * dt;
+			particles[index+ParticleBlue] += particles[index+ParticleBlueDelta] * dt;
+		}
 
-		particles[index+ParticleSize] = Math.max(0.0, particles[index+ParticleSize] + particles[index+ParticleSizeDelta]*dt);
+		if ( useAlpha ) {
+			particles[index+ParticleAlpha] += particles[index+ParticleAlphaDelta] * dt;
+		}
 
-		particles[index+ParticleRotation] += particles[index+ParticleRotationDelta ] * dt;
+		if ( useScale ) {
+			particles[index+ParticleSize] = Math.max(0.0, particles[index+ParticleSize] + particles[index+ParticleSizeDelta]*dt);
+		}
+
+		if ( useRotate ) {
+			particles[index+ParticleRotation] += particles[index+ParticleRotationDelta ] * dt;
+		}
 
 		return true;
 	}

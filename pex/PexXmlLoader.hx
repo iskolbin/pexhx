@@ -5,7 +5,7 @@ import haxe.macro.Context;
 
 class PexXmlLoader {
 	public static inline function deg2rad( deg: Float ): Float {
-		return deg / Math.PI;
+		return deg * 0.017453292519943;
 	}
 
 	public static function init( ps: PexEmitter, xml: Xml ) {
@@ -105,11 +105,11 @@ class PexXmlLoader {
 	}
 
 	static function parseIntNode( node: Xml, attr: String = "value" ): Int {
-		return (node == null ? 0 : parseIntString(node.get("value")));
+		return (node == null ? 0 : parseIntString(node.get(attr)));
 	}
 
 	static function parseFloatNode( node: Xml, attr: String = "value" ): Float {
-		return (node == null ? 0 : parseFloatString(node.get("value")));
+		return (node == null ? 0 : parseFloatString(node.get(attr)));
 	}
 
 	static function parseIntString( s: String ): Int {
