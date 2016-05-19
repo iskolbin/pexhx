@@ -74,6 +74,7 @@ class PexHtml5CanvasRenderer {
 
 	public function render( emitter: PexEmitter, image: ImageElement ) {
 		var predCompositeOp = context.globalCompositeOperation;
+		var predAlpha = context.globalAlpha;
 		context.globalCompositeOperation = additive ? "lighter" : "destination-over";
 		
 		var idx = emitter.getShiftedIndex(0);
@@ -116,6 +117,7 @@ class PexHtml5CanvasRenderer {
 			idx = emitter.incrementShiftedIndex(idx);
 		}
 
+		context.globalAlpha = predAlpha;
 		context.globalCompositeOperation = predCompositeOp;
 	}
 }
