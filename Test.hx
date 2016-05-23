@@ -1,4 +1,4 @@
-import pex.PexXmlLoader;
+import pex.PexIo;
 import pex.PexEmitter;
 import pex.backend.PexHtml5CanvasRenderer;
 import js.Browser;
@@ -12,7 +12,7 @@ class Test {
 	static var canvas: CanvasElement;
 
 	public static function main() {
-		particleEmitter = PexXmlLoader.loadCompileTime( "test/particle.pex" );
+		particleEmitter = PexIo.loadFromXmlCompileTime( "test/particle.pex" );
 		
 		canvas = Browser.document.createCanvasElement();
 		canvas.width = 640;
@@ -25,6 +25,8 @@ class Test {
 		particleImage = cast Browser.document.getElementById("particleImage");
 		particleEmitter.start( Math.POSITIVE_INFINITY );
 		Browser.window.requestAnimationFrame( update );
+	
+		trace( PexIo.encodeXml( particleEmitter ));
 	}
 
 	static var start = 0.0;
