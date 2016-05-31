@@ -5,28 +5,23 @@ import js.Browser;
 import js.html.ImageElement;
 import js.html.CanvasElement;
 
-class Test {
+class Html5Editor {
 	static var particleEmitter: PexEmitter;
 	static var particleRenderer: PexHtml5CanvasRenderer;
 	static var particleImage: ImageElement;
 	static var canvas: CanvasElement;
 
 	public static function main() {
-		particleEmitter = PexIo.loadFromXmlCompileTime( "test/particle.pex" );
+		particleEmitter = PexIo.loadFromXmlCompileTime( "html5editor/particle.pex" );
 		
-		canvas = Browser.document.createCanvasElement();
-		canvas.width = 640;
-		canvas.height = 480;
+		canvas = cast Browser.document.getElementById( "canvas-editor" );//createCanvasElement();
 		canvas.style.backgroundColor = "black";
 			
-		Browser.document.body.appendChild( canvas );
 		
 		particleRenderer = new PexHtml5CanvasRenderer( canvas );
 		particleImage = cast Browser.document.getElementById("particleImage");
 		particleEmitter.start( Math.POSITIVE_INFINITY );
 		Browser.window.requestAnimationFrame( update );
-	
-		trace( PexIo.encodeXml( particleEmitter ));
 	}
 
 	static var start = 0.0;

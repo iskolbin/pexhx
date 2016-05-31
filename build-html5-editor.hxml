@@ -1,0 +1,4 @@
+-js html5editor/html5editor.js
+-main Html5Editor
+-D -js-flatten
+-dce full

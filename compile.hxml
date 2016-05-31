@@ -1,4 +1,0 @@
--js test/test.js
--main Test
--D -js-flatten
--dce full
