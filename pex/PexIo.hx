@@ -90,6 +90,71 @@ class PexIo {
 		return ps;
 	}
 
+	public static function setParamFromString( ps: PexEmitter, key: String, value: String ) {
+		switch ( key ) {
+			case "emitterType": ps.emitterType = (value == "Gravity" ? Gravity : Radial );
+			case "maxParticles": ps.maxParticles = Std.parseInt( value );
+			case "duration": ps.duration = Std.parseFloat( value );
+			case "gravityX": ps.gravityX = Std.parseFloat( value );
+			case "gravityY": ps.gravityY = Std.parseFloat( value );
+			case "particleLifespan": ps.particleLifespan = Std.parseFloat( value );
+			case "particleLifespanVariance": ps.particleLifespanVariance = Std.parseFloat( value );
+
+			case "speed": ps.speed = Std.parseFloat( value );
+			case "speedVariance": ps.speedVariance = Std.parseFloat( value );
+			case "sourcePositionX": ps.sourcePositionX = Std.parseFloat( value );
+			case "sourcePositionY": ps.sourcePositionY = Std.parseFloat( value );	
+			case "sourcePositionXVariance": ps.sourcePositionXVariance = Std.parseFloat( value );
+			case "sourcePositionYVariance": ps.sourcePositionYVariance = Std.parseFloat( value );	
+			case "angle": ps.angle = Std.parseFloat( value );
+			case "angleVariance": ps.angleVariance = Std.parseFloat( value );
+	
+			case "startParticleSize": ps.startParticleSize = Std.parseFloat( value );
+			case "startParticleSizeVariance": ps.startParticleSizeVariance = Std.parseFloat( value );
+			case "finishParticleSize": ps.finishParticleSize = Std.parseFloat( value );
+			case "finishParticleSizeVariance": ps.finishParticleSizeVariance = Std.parseFloat( value );
+				
+			case "startColorRed": ps.startColorRed = Std.parseFloat( value );
+			case "startColorRedVariance": ps.startColorRedVariance = Std.parseFloat( value );
+			case "startColorGreen": ps.startColorGreen = Std.parseFloat( value );
+			case "startColorGreenVariance": ps.startColorGreenVariance = Std.parseFloat( value );
+			case "startColorBlue": ps.startColorBlue = Std.parseFloat( value );
+			case "startColorBlueVariance": ps.startColorBlueVariance = Std.parseFloat( value );
+			case "startColorAlpha": ps.startColorAlpha = Std.parseFloat( value );
+			case "startColorAlphaVariance": ps.startColorAlphaVariance = Std.parseFloat( value );
+			case "finishColorRed": ps.finishColorRed = Std.parseFloat( value );
+			case "finishColorRedVariance": ps.finishColorRedVariance = Std.parseFloat( value );
+			case "finishColorGreen": ps.finishColorGreen = Std.parseFloat( value );
+			case "finishColorGreenVariance": ps.finishColorGreenVariance = Std.parseFloat( value );
+			case "finishColorBlue": ps.finishColorBlue = Std.parseFloat( value );
+			case "finishColorBlueVariance": ps.finishColorBlueVariance = Std.parseFloat( value );
+			case "finishColorAlpha": ps.finishColorAlpha = Std.parseFloat( value );
+			case "finishColorAlphaVariance": ps.finishColorAlphaVariance = Std.parseFloat( value );
+		
+			case "minRadius": ps.minRadius = Std.parseFloat( value );
+			case "minRadiusVariance": ps.minRadiusVariance = Std.parseFloat( value );
+			case "maxRadius": ps.maxRadius = Std.parseFloat( value );
+			case "maxRadiusVariance": ps.maxRadiusVariance = Std.parseFloat( value );
+
+			case "rotationStart":	ps.rotationStart = Std.parseFloat( value );
+			case "rotationStartVariance":	ps.rotationStartVariance = Std.parseFloat( value );
+			case "rotationEnd":	ps.rotationEnd = Std.parseFloat( value );
+			case "rotationEndVariance":	ps.rotationEndVariance = Std.parseFloat( value );
+			case "rotatePerSecond":	ps.rotatePerSecond = Std.parseFloat( value );
+			case "rotatePerSecondVariance":	ps.rotatePerSecondVariance = Std.parseFloat( value );
+	
+			case "radialAcceleration": ps.radialAcceleration = Std.parseFloat( value );
+			case "radialAccelerationVariance": ps.radialAccelerationVariance = Std.parseFloat( value );
+			case "tangentialAcceleration": ps.tangentialAcceleration = Std.parseFloat( value );
+			case "tangentialAccelerationVariance": ps.tangentialAccelerationVariance = Std.parseFloat( value );
+		
+			case "blendFuncSource": ps.blendFuncSource = cast Std.parseInt( value );
+			case "blendFuncDestination": ps.blendFuncDestination = cast Std.parseInt( value );
+			case "texture": ps.texture = value;
+			case "yCoordFlipped": ps.yCoordFlipped = value == "1";
+		}	
+	}
+
 	public static function decodeXml( xmlContent: String ): PexEmitter {
 		return initFromXml( new PexEmitter(), Xml.parse( xmlContent ));
 	}
