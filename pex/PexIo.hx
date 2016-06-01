@@ -92,7 +92,7 @@ class PexIo {
 
 	public static function setParamFromString( ps: PexEmitter, key: String, value: String ) {
 		switch ( key ) {
-			case "emitterType": ps.emitterType = (value == "Gravity" ? Gravity : Radial );
+			case "emitterType": ps.emitterType = cast Std.parseInt( value );
 			case "maxParticles": ps.maxParticles = Std.parseInt( value );
 			case "duration": ps.duration = Std.parseFloat( value );
 			case "gravityX": ps.gravityX = Std.parseFloat( value );
@@ -106,8 +106,8 @@ class PexIo {
 			case "sourcePositionY": ps.sourcePositionY = Std.parseFloat( value );	
 			case "sourcePositionXVariance": ps.sourcePositionXVariance = Std.parseFloat( value );
 			case "sourcePositionYVariance": ps.sourcePositionYVariance = Std.parseFloat( value );	
-			case "angle": ps.angle = Std.parseFloat( value );
-			case "angleVariance": ps.angleVariance = Std.parseFloat( value );
+			case "angle": ps.angle = deg2rad( Std.parseFloat( value ));
+			case "angleVariance": ps.angleVariance = deg2rad( Std.parseFloat( value ));
 	
 			case "startParticleSize": ps.startParticleSize = Std.parseFloat( value );
 			case "startParticleSizeVariance": ps.startParticleSizeVariance = Std.parseFloat( value );
@@ -136,11 +136,11 @@ class PexIo {
 			case "maxRadius": ps.maxRadius = Std.parseFloat( value );
 			case "maxRadiusVariance": ps.maxRadiusVariance = Std.parseFloat( value );
 
-			case "rotationStart":	ps.rotationStart = Std.parseFloat( value );
-			case "rotationStartVariance":	ps.rotationStartVariance = Std.parseFloat( value );
-			case "rotationEnd":	ps.rotationEnd = Std.parseFloat( value );
-			case "rotationEndVariance":	ps.rotationEndVariance = Std.parseFloat( value );
-			case "rotatePerSecond":	ps.rotatePerSecond = Std.parseFloat( value );
+			case "rotationStart":	ps.rotationStart = deg2rad( Std.parseFloat( value ));
+			case "rotationStartVariance":	ps.rotationStartVariance = deg2rad( Std.parseFloat( value ));
+			case "rotationEnd":	ps.rotationEnd = deg2rad( Std.parseFloat( value ));
+			case "rotationEndVariance":	ps.rotationEndVariance = deg2rad( Std.parseFloat( value ));
+			case "rotatePerSecond":	ps.rotatePerSecond = deg2rad( Std.parseFloat( value ));
 			case "rotatePerSecondVariance":	ps.rotatePerSecondVariance = Std.parseFloat( value );
 	
 			case "radialAcceleration": ps.radialAcceleration = Std.parseFloat( value );
@@ -152,6 +152,8 @@ class PexIo {
 			case "blendFuncDestination": ps.blendFuncDestination = cast Std.parseInt( value );
 			case "texture": ps.texture = value;
 			case "yCoordFlipped": ps.yCoordFlipped = value == "1";
+		
+			case _: throw 'Bad key/value for setting emitter parameter from string: ${key} => ${value}'; 
 		}	
 	}
 
